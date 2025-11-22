@@ -1,22 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Axios } from "axios";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
+    const router = useRouter();
     const [user, setUser] = React.useState({
         username: "",
         email: "",
         password: "",
     });
+    const [buttonDisabled, setButtonDisabled] = React.useState(false);
+    useState(false);
+    const [loading, setLoading] = React.useState(false);
 
-    const onSignUp = async () => {};
+    const onSignUp = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.post("/api/auth/register", user);
+            console.log("Sign up response", response.data);
+            router.push("/auth/login");
+            toast.success("Registered successfully! Please login.");
+        } catch (error: any) {
+            console.log("Error during sign up", error);
+            toast.error(error.message);
+        } finally {
+        }
+    };
+
+    useEffect(() => {
+        if (
+            user.email.length > 0 &&
+            user.password.length > 0 &&
+            user.username.length > 0
+        ) {
+            setButtonDisabled(false);
+        } else {
+            setButtonDisabled(true);
+        }
+    }, [user]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h1 className="text-center text-2xl mb-5">Register Page</h1>
+            <h1 className="text-center text-2xl mb-5">
+                {loading ? "Processing" : "Sign Up"}
+            </h1>
             <hr />
 
             <label htmlFor="username">Username</label>
@@ -53,7 +84,7 @@ export default function RegisterPage() {
                 onClick={onSignUp}
                 className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
             >
-                Signup here
+                {buttonDisabled ? "No signup" : "Sign Up"}
             </button>
             <Link href="/auth/login">Registered? Login here</Link>
         </div>
