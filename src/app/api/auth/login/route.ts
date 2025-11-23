@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
             user: tokenData,
         });
 
-        response.cookies.set("token", token, {
+        response.cookies.set("authToken", token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60, // 1 day
         });
