@@ -2,6 +2,7 @@ import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export async function POST(request: NextRequest) {
     try {
@@ -9,35 +10,49 @@ export async function POST(request: NextRequest) {
         await connect();
 
         const reqBody = await request.json();
-        const { username, email, password } = reqBody;
+        const { email, password } = reqBody;
 
         // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
+        const user = await User.findOne({ email });
+        if (!user) {
             return NextResponse.json(
-                { message: "User already exists. Please login." },
+                { message: "Invalid credentials" },
                 { status: 400 }
             );
         }
 
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        // check if pass is correct
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return NextResponse.json(
+                { message: "Invalid credentials" },
+                { status: 400 }
+            );
+        }
 
-        // Create new user
-        const newUser = new User({
-            username,
-            email,
-            password: hashedPassword,
+        // create token data
+        const tokenData = {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+        };
+
+        // create the token
+        const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
+            expiresIn: "1d",
         });
 
-        const savedUser = await newUser.save();
-
-        return NextResponse.json({
-            message: "User registered successfully.",
-            status: 201,
-            savedUser,
+        const response = NextResponse.json({
+            message: "User logged in successfully",
+            status: 200,
+            user: tokenData,
         });
+
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60, // 1 day
+        });
+        return response;
     } catch (error) {
         console.error("Error during user registration:", error);
         return NextResponse.json(
