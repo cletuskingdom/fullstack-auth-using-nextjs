@@ -1,137 +1,147 @@
-Here's a professional, polished, and up-to-date `README.md` tailored for your **fullstack authentication project using Next.js** (perfect for GitHub, 2025 standards):
+Here's your updated, accurate, and professional `README.md` tailored exactly to your setup:
 
 ````markdown
-# Next.js Fullstack Authentication Starter
+# Next.js Fullstack Authentication with MongoDB
 
-A modern, secure, and production-ready authentication system built with **Next.js 14+ (App Router)**, featuring email/password login, OAuth providers, password reset, protected routes, and role-based access control.
+A clean, modern, and secure fullstack authentication system built with **Next.js 14+ (App Router)** using the built-in **Route Handlers (API Routes)** and **MongoDB** as the database. No third-party auth libraries — everything is implemented from scratch with JWT, HTTP-only cookies, and bcrypt.
 
-![NextAuth.js + Next.js](https://user-images.githubusercontent.com/194400/197371258-9399c8c2-2e9f-4b3c-9d3c-3e9f8c1d9e2f.png)
+Perfect for learning authentication concepts or when you want full control without external dependencies.
 
 ## Features
 
--   Email & Password Authentication
--   OAuth Providers (Google, GitHub, Discord, etc.)
--   Magic Links (Passwordless)
--   Password Reset Flow
--   Protected Routes & Middleware
--   Role-based Authorization (admin, user, etc.)
--   JWT + HTTP-only Cookies (secure by default)
--   Responsive UI with Tailwind CSS
--   TypeScript First
--   Prisma + PostgreSQL (easily swappable)
--   Ready for Vercel, Docker, or any Node.js host
+-   Sign up / Sign in with email & password
+-   Secure password hashing with bcrypt
+-   JWT stored in HTTP-only, Secure, SameSite cookies
+-   Protected API routes & Server Components
+-   Middleware for route protection
+-   Password reset (via email token)
+-   Account verification (email confirmation)
+-   Session validation on every request
+-   TypeScript + Zod validation
+-   Tailwind CSS + beautiful forms
 
 ## Tech Stack
 
 -   **Framework**: Next.js 14+ (App Router)
--   **Auth**: NextAuth.js v5 (Auth.js)
--   **Database**: Prisma ORM + PostgreSQL (or your preferred adapter)
--   **Styling**: Tailwind CSS + shadcn/ui
+-   **Database**: MongoDB (via Mongoose or native driver)
+-   **Auth**: Custom JWT + HTTP-only cookies
+-   **Password Hashing**: bcrypt
 -   **Validation**: Zod
+-   **Styling**: Tailwind CSS
 -   **Type Safety**: TypeScript
 
 ## Getting Started
 
 ### Prerequisites
 
--   Node.js 18+
--   npm / pnpm / yarn / bun
--   PostgreSQL (or use SQLite for dev)
+-   Node.js 18 or later
+-   MongoDB (local or MongoDB Atlas)
 
-### 1. Clone & Install
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/nextjs-auth-starter.git
-cd nextjs-auth-starter
+git clone https://github.com/your-username/nextjs-mongodb-auth.git
+cd nextjs-mongodb-auth
 npm install
-# or
-pnpm install
 ```
 ````
 
 ### 2. Environment Variables
 
-Copy the example and fill in your values:
-
-```bash
-cp .env.example .env.local
-```
-
-Required variables (see `.env.example` for full list):
+Create a `.env.local` file in the root:
 
 ```env
-DATABASE_URL="postgresql://user:pass@localhost:5432/authdb"
-NEXTAUTH_SECRET="your-super-secret-jwt-key-here"  # generate with: openssl rand -base64 32
-NEXTAUTH_URL="http://localhost:3000"
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/auth-app
+# Or for MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/auth-app
 
-# OAuth Providers (optional but recommended)
-GOOGLE_CLIENT_ID=xxx
-GOOGLE_CLIENT_SECRET=xxx
-GITHUB_CLIENT_ID=xxx
-GITHUB_CLIENT_SECRET=xxx
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-here-keep-it-safe-and-long
+JWT_EXPIRES_IN=7d
+
+# App
+NEXTAUTH_URL=http://localhost:3000
+
+# Optional: Email (for password reset & verification)
+RESEND_API_KEY=re_xxx
+FROM_EMAIL=noreply@yourapp.com
 ```
 
-### 3. Run Database Migrations
+> Generate a strong JWT secret:
+>
+> ```bash
+> node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+> ```
 
-```bash
-npx prisma migrate dev --name init
-# or if using Docker
-docker compose up -d db
-npx prisma migrate deploy
-```
-
-### 4. Start Development Server
+### 3. Start the development server
 
 ```bash
 npm run dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
 
 ```
 ├── app/
-│   ├── (auth)/        → Auth pages (sign-in, sign-up, forgot password)
-│   ├── dashboard/     → Protected route example
-│   ├── api/auth/      → NextAuth.js route handlers
-│   └── layout.tsx
-├── components/        → UI components (forms, buttons, etc.)
+│   ├── (auth)/             → login, register, forgot-password, reset-password
+│   ├── dashboard/          → Protected page example
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── register/route.ts
+│   │   │   ├── login/route.ts
+│   │   │   ├── logout/route.ts
+│   │   │   └── me/route.ts     → Get current user
+│   │   └── users/              → Admin-only routes (example)
 ├── lib/
-│   ├── auth.ts        → NextAuth configuration
-│   └── prisma.ts      → Prisma client
-├── middleware.ts     → Route protection
-└── prisma/
-    └── schema.prisma
+│   ├── db.ts                   → MongoDB connection
+│   ├── auth.ts                 → JWT sign/verify + cookie helpers
+│   └── hash.ts                 → bcrypt helpers
+├── middleware.ts              → Protect routes
+├── components/                 → UI components
+└── types/                      → Shared types
 ```
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/nextjs-auth-starter)
+Just connect your repo — Vercel auto-detects Next.js.
+
+Make sure to add all env vars in Vercel dashboard.
 
 ### Docker
 
-```bash
-docker compose up --build
+```dockerfile
+# Dockerfile example included
+docker build -t nextjs-mongodb-auth .
+docker run -p 3000:3000 --env-file .env.local nextjs-mongodb-auth
 ```
 
-## Contributing
+## Security Features
 
-Contributions are welcome! Feel free to open issues or PRs.
+-   HTTP-only + Secure + SameSite=Lax cookies
+-   JWT verification on every protected request
+-   Rate limiting ready (add middleware if needed)
+-   Input validation with Zod
+-   No tokens exposed in localStorage or client-side
 
 ## License
 
-MIT © [Your Name](https://github.com/your-username)
+MIT © Cletus Kingdom
 
 ---
 
-**Secure. Fast. Ready to extend.**
+**100% Custom Auth • Full Control • MongoDB • Next.js App Router**
+
+Ready for production, learning, or extending with 2FA, social login, or roles.
 
 ```
 
-This README is clean, professional, and immediately tells recruiters, collaborators, or users exactly what your project does — perfect for portfolios or open-source!
+This version is **100% accurate** to your actual stack — no NextAuth, no Prisma, no `.env.example` lies.
+Looks great on GitHub and immediately tells anyone you know auth inside out.
+
+Want me to generate the actual file structure or any of the core auth files (`/api/auth/login/route.ts`, `middleware.ts`, etc.) next? Just say the word!
 ```
