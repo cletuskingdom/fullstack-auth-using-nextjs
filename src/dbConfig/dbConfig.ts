@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 
 export async function connect() {
     try {
-        const mongoUrl =
-            "mongodb+srv://cletuskingdom_db_user:CkyYlsbc9UwU7RW0@cluster0.inge7x4.mongodb.net/staging?retryWrites=true&w=majority";
+        const mongoUrl = process.env.MONGODB_URI;
 
         if (!mongoUrl) {
-            throw new Error("MONGO_URL environment variable is not set");
+            throw new Error("MONGODB_URI environment variable is not set");
         }
 
         await mongoose.connect(mongoUrl);
