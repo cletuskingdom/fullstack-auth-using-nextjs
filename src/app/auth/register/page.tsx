@@ -20,14 +20,18 @@ export default function RegisterPage() {
     const onSignUp = async () => {
         try {
             setLoading(true);
-            const response = await axios.post("/api/auth/register", user);
-            console.log("Sign up response", response.data);
-            router.push("/auth/login");
+            await axios.post("/api/auth/register", user);
             toast.success("Registered successfully! Please login.");
+            router.push("/auth/login");
         } catch (error: any) {
+            const errorMessage =
+                error.response?.data?.message ||
+                error.message ||
+                "An error occurred during registration";
+            toast.error(errorMessage);
             console.log("Error during sign up", error);
-            toast.error(error.message);
         } finally {
+            setLoading(false);
         }
     };
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -18,11 +19,15 @@ export default function LoginPage() {
     const onLogin = async () => {
         try {
             setLoading(true);
-            const response = await axios.post("/api/auth/login", user);
-            console.log("Login success", response.data);
+            await axios.post("/api/auth/login", user);
             router.push("/dashboard");
         } catch (error: any) {
-            console.log("Login failed", error.message);
+            const errorMessage =
+                error.response?.data?.message ||
+                error.message ||
+                "An error occurred during login";
+            toast.error(errorMessage);
+            console.log("Login failed", error);
         } finally {
             setLoading(false);
         }
