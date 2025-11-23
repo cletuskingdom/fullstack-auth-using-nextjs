@@ -45,11 +45,8 @@ export default function RegisterPage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h1 className="text-center text-2xl mb-5">
-                {loading ? "Processing" : "Sign Up"}
-            </h1>
+            <h1 className="text-center text-2xl mb-5">Sign Up</h1>
             <hr />
-
             <label htmlFor="username">Username</label>
             <input
                 className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
@@ -59,7 +56,6 @@ export default function RegisterPage() {
                 onChange={(e) => setUser({ ...user, username: e.target.value })}
                 placeholder="username"
             />
-
             <label htmlFor="email">email</label>
             <input
                 className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
@@ -69,7 +65,6 @@ export default function RegisterPage() {
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
                 placeholder="email"
             />
-
             <label htmlFor="password">password</label>
             <input
                 className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
@@ -82,9 +77,14 @@ export default function RegisterPage() {
 
             <button
                 onClick={onSignUp}
-                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
+                disabled={buttonDisabled || loading}
+                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {buttonDisabled ? "No signup" : "Sign Up"}
+                {buttonDisabled
+                    ? "No signup"
+                    : loading
+                    ? "Processing..."
+                    : "Sign Up"}
             </button>
             <Link href="/auth/login">Registered? Login here</Link>
         </div>
